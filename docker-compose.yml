@@ -1,0 +1,15 @@
+version: '3'
+services:
+  rust-terminal:
+    build:
+      context: ./remote_terminal
+      dockerfile: Dockerfile
+    ports:
+      - 8082:8082
+    volumes:
+      - ./remote_terminal:/home/app/remote_terminal
+    networks:
+      - internal-network
+
+networks:
+  internal-network:
