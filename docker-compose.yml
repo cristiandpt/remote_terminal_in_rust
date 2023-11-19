@@ -11,5 +11,16 @@ services:
     networks:
       - internal-network
 
+   remote-server:
+    build:
+      context: ./remote_server
+      dockerfile: Dockerfile
+    ports:
+      - 8083:8083
+    volumes:
+      - ./remote_server:/home/app/remote_server
+    networks:
+      - internal-network
+
 networks:
   internal-network:
