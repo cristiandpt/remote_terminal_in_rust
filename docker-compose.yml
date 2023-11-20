@@ -33,9 +33,9 @@ services:
         - ./remote_shell_c/lib:/usr/src/client_shell/lib
       networks:
         - internal-network
-      stdin_open: true
-      tty: true
-      command: bash  
+      #stdin_open: true
+      #tty: true
+      #command: bash  
 
   c-server:
       build:

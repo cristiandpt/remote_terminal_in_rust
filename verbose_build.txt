@@ -1,0 +1,114 @@
+#0 building with "default" instance using docker driver
+
+#1 [c-client internal] load build definition from Dockerfile_client
+#1 transferring dockerfile: 439B done
+#1 DONE 0.0s
+
+#2 [c-client internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.1s
+
+#3 [c-client internal] load metadata for docker.io/library/gcc:4.9
+#3 DONE 0.5s
+
+#4 [c-client libstage 1/2] FROM docker.io/library/gcc:4.9@sha256:6356ef8b29cc3522527a85b6c58a28626744514bea87a10ff2bf67599a7474f5
+#4 CACHED
+
+#5 [c-client internal] load build context
+#5 transferring context: 602B 0.0s done
+#5 DONE 0.1s
+
+#6 [c-client stage-1 2/9] RUN ["mkdir", "-p", "/usr/src/client_shell/lib"]
+#6 ...
+
+#7 [c-client libstage 2/2] COPY ./lib /usr/src/temp_lib
+#7 DONE 0.3s
+
+#6 [c-client stage-1 2/9] RUN ["mkdir", "-p", "/usr/src/client_shell/lib"]
+#6 DONE 0.7s
+
+#8 [c-client stage-1 3/9] COPY --from=libstage /usr/src/temp_lib /usr/src/client_shell/lib
+#8 DONE 0.2s
+
+#9 [c-client stage-1 4/9] COPY ./c_remote_client /usr/src/client_shell
+#9 DONE 0.2s
+
+#10 [c-client stage-1 5/9] WORKDIR /usr/src/client_shell
+#10 DONE 0.2s
+
+#11 [c-client stage-1 6/9] RUN ls -lsa
+#11 0.509 total 48
+#11 0.509 8 drwxr-xr-x 1 root root 4096 Nov 20 22:03 .
+#11 0.509 8 drwxr-xr-x 1 root root 4096 Nov 20 22:10 ..
+#11 0.509 4 -rw-rw-r-- 1 root root 1006 Nov 20 20:55 Makefile
+#11 0.509 4 -rw-rw-r-- 1 root root  546 Nov 20 20:55 basic_client.c
+#11 0.509 4 -rw-rw-r-- 1 root root  812 Nov 20 20:55 file_client.c
+#11 0.509 4 -rw-rw-r-- 1 root root 1416 Nov 20 20:55 leercadena.c
+#11 0.509 4 -rw-rw-r-- 1 root root  679 Nov 20 20:55 leercadena.h
+#11 0.509 4 -rw-rw-r-- 1 root root  667 Nov 20 20:55 leercadena_main.c
+#11 0.509 4 drwxr-xr-x 1 root root 4096 Nov 20 22:02 lib
+#11 0.509 4 -rw-rw-r-- 1 root root   97 Nov 20 20:55 shell_client.c
+#11 DONE 0.6s
+
+#12 [c-client stage-1 7/9] RUN ls -lsa lib
+#12 0.486 total 36
+#12 0.486 4 drwxr-xr-x 1 root root 4096 Nov 20 22:02 .
+#12 0.486 8 drwxr-xr-x 1 root root 4096 Nov 20 22:03 ..
+#12 0.486 4 -rw-rw-r-- 1 root root  855 Nov 20 20:55 archivo.c
+#12 0.486 4 -rw-rw-r-- 1 root root  347 Nov 20 20:55 archivo.h
+#12 0.486 4 -rw-rw-r-- 1 root root  292 Nov 20 20:55 archivo_main.c
+#12 0.486 8 -rw-rw-r-- 1 root root 4977 Nov 20 20:55 tcp.c
+#12 0.486 4 -rw-rw-r-- 1 root root 1264 Nov 20 20:55 tcp.h
+#12 DONE 0.6s
+
+#13 [c-client stage-1 8/9] RUN ["make", "all"]
+#13 0.551 gcc -std=c11 -I./lib -c ./lib/tcp.c
+#13 0.612 ./lib/tcp.c: In function 'TCP_Open_By_IP':
+#13 0.612 ./lib/tcp.c:34:2: warning: implicit declaration of function 'bzero' [-Wimplicit-function-declaration]
+#13 0.612   bzero(&servaddr, sizeof(servaddr)); 
+#13 0.612   ^
+#13 0.627 gcc -std=c11 -I./lib -o basic_client basic_client.c tcp.o
+#13 0.664 gcc -std=c11 -I./lib -c leercadena.c
+#13 0.676 leercadena.c: In function 'de_cadena_a_vector':
+#13 0.676 leercadena.c:43:5: warning: implicit declaration of function 'strdup' [-Wimplicit-function-declaration]
+#13 0.676      resultado[i] = strdup(token);
+#13 0.676      ^
+#13 0.676 leercadena.c:43:18: warning: assignment makes pointer from integer without a cast
+#13 0.676      resultado[i] = strdup(token);
+#13 0.676                   ^
+#13 0.688 gcc -std=c11 -I./lib -c ./lib/archivo.c
+#13 0.712 gcc -std=c11 -I./lib -o shell_client shell_client.c leercadena.o archivo.o tcp.o
+#13 0.748 gcc -std=c11 -I./lib -o file_client file_client.c tcp.o
+#13 0.785 gcc -std=c11 -I./lib -o archivo_main ./lib/archivo_main.c archivo.o
+#13 0.817 gcc -std=c11 -I./lib -o leercadena_main leercadena_main.c leercadena.o
+#13 DONE 1.0s
+
+#14 [c-client stage-1 9/9] RUN ls -lsa
+#14 0.505 total 132
+#14 0.505  4 drwxr-xr-x 1 root root  4096 Nov 20 22:10 .
+#14 0.505  8 drwxr-xr-x 1 root root  4096 Nov 20 22:10 ..
+#14 0.505  4 -rw-rw-r-- 1 root root  1006 Nov 20 20:55 Makefile
+#14 0.505  4 -rw-r--r-- 1 root root  2800 Nov 20 22:10 archivo.o
+#14 0.505 12 -rwxr-xr-x 1 root root  8912 Nov 20 22:10 archivo_main
+#14 0.505 16 -rwxr-xr-x 1 root root 13736 Nov 20 22:10 basic_client
+#14 0.505  4 -rw-rw-r-- 1 root root   546 Nov 20 20:55 basic_client.c
+#14 0.505 16 -rwxr-xr-x 1 root root 14328 Nov 20 22:10 file_client
+#14 0.505  4 -rw-rw-r-- 1 root root   812 Nov 20 20:55 file_client.c
+#14 0.505  4 -rw-rw-r-- 1 root root  1416 Nov 20 20:55 leercadena.c
+#14 0.505  4 -rw-rw-r-- 1 root root   679 Nov 20 20:55 leercadena.h
+#14 0.505  4 -rw-r--r-- 1 root root  2976 Nov 20 22:10 leercadena.o
+#14 0.505 12 -rwxr-xr-x 1 root root  9696 Nov 20 22:10 leercadena_main
+#14 0.505  4 -rw-rw-r-- 1 root root   667 Nov 20 20:55 leercadena_main.c
+#14 0.505  4 drwxr-xr-x 1 root root  4096 Nov 20 22:02 lib
+#14 0.505 16 -rwxr-xr-x 1 root root 16096 Nov 20 22:10 shell_client
+#14 0.505  4 -rw-rw-r-- 1 root root    97 Nov 20 20:55 shell_client.c
+#14 0.505  8 -rw-r--r-- 1 root root  7608 Nov 20 22:10 tcp.o
+#14 DONE 0.6s
+
+#15 [c-client] exporting to image
+#15 exporting layers
+#15 exporting layers 0.5s done
+#15 writing image sha256:a43b37168af34a5b4723305b0f305dde21b24b1d1fbb2c4dfc26b0710424b923 done
+#15 naming to docker.io/library/remote_terminal_in_rust-c-client
+#15 naming to docker.io/library/remote_terminal_in_rust-c-client 0.0s done
+#15 DONE 0.5s
