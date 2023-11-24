@@ -1,25 +1,26 @@
+INCLUDE = -I./lib
+CFLAGS = -std=c11
+
 all: basic_server shell_server file_server archivo leercadena
 
-
-
 basic_server: tcp.o
-	gcc -o basic_server basic_server.c tcp.o
+	gcc $(CFLAGS) $(INCLUDE) -o basic_server basic_server.c tcp.o
 
 
 file_server: tcp.o
-	gcc -o file_server file_server.c tcp.o
+	gcc $(CFLAGS) $(INCLUDE) -o file_server file_server.c tcp.o
 
 tcp.o:
-	gcc -c tcp.c
+	gcc $(CFLAGS) $(INCLUDE) -c ./lib/tcp.c
 
 # ---
 # Para compilar la prueba de leercadena
 #
 leercadena: leercadena.o 
-	gcc -o leercadena_main leercadena_main.c leercadena.o
+	gcc $(CFLAGS) $(INCLUDE) -o leercadena_main ./lib/leercadena_main.c leercadena.o
 
 leercadena.o:
-	gcc -c leercadena.c
+	gcc $(CFLAGS) $(INCLUDE) -c ./lib/leercadena.c
 
 # ---
 
@@ -27,10 +28,10 @@ leercadena.o:
 # Para compilar archivo_main
 #
 archivo: archivo.o
-	gcc -o archivo_main archivo_main.c archivo.o
+	gcc $(CFLAGS) $(INCLUDE) -o archivo_main ./lib/archivo_main.c archivo.o
 
 archivo.o:
-	gcc -c archivo.c
+	gcc $(CFLAGS) $(INCLUDE) -c ./lib/archivo.c
 
 # ---
 
@@ -41,7 +42,7 @@ archivo.o:
 #
 
 shell_server: leercadena.o archivo.o tcp.o
-	gcc -o shell_server shell_server.c leercadena.o archivo.o tcp.o
+	gcc $(CFLAGS) $(INCLUDE) -o shell_server shell_server.c leercadena.o archivo.o tcp.o
 
 
 clean:

@@ -1,0 +1,11 @@
+FROM gcc:4.9
+RUN ["mkdir", "-p", "/usr/src/server_shell/lib"]
+COPY ./c_remote_server /usr/src/server_shell
+
+WORKDIR /usr/src/server_shell
+
+COPY ./lib /usr/src/server_shell/lib 
+RUN ["ls", "-lsa", "/usr/src/server_shell/lib"]
+RUN ["make", "all"]
+CMD ["bash"]
+#CMD ["./server_shell"]

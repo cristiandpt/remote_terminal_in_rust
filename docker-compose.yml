@@ -39,13 +39,13 @@ services:
 
   c-server:
       build:
-        context: ./remote_shell_c/c_remote_server
-        dockerfile: Dockerfile
+        context: ./remote_shell_c
+        dockerfile: Dockerfile_server
       ports:
         - 8084:8084
       volumes:
-        - ./remote_shell_c/c_remote_client:/usr/src/server_shell
-        - ./remote_shell_c/lib:/usr/src/server_shell/lib
+        - ./remote_shell_c/c_remote_server:/usr/src/server_shell
+        #- ./remote_shell_c/lib:/usr/src/server_shell/lib
       networks:
         - internal-network      
 

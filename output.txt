@@ -1,0 +1,58 @@
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile_server
+#2 transferring dockerfile: 328B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/gcc:4.9
+#3 DONE 0.5s
+
+#4 [1/7] FROM docker.io/library/gcc:4.9@sha256:6356ef8b29cc3522527a85b6c58a28626744514bea87a10ff2bf67599a7474f5
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 414B done
+#5 DONE 0.0s
+
+#6 [2/7] RUN ["mkdir", "-p", "/usr/src/server_shell/lib"]
+#6 DONE 0.2s
+
+#7 [3/7] COPY ./c_remote_server /usr/src/server_shell
+#7 DONE 0.0s
+
+#8 [4/7] WORKDIR /usr/src/server_shell
+#8 DONE 0.0s
+
+#9 [5/7] COPY ./lib /usr/src/server_shell/lib
+#9 DONE 0.0s
+
+#10 [6/7] RUN ["ls", "-lsa", "/usr/src/server_shell/lib"]
+#10 0.185 total 36
+#10 0.185 4 drwxr-xr-x 1 root root 4096 Nov 24 23:41 .
+#10 0.185 8 drwxr-xr-x 1 root root 4096 Nov 24 23:41 ..
+#10 0.185 4 -rw-r--r-- 1 root root  855 Nov 24 23:07 archivo.c
+#10 0.185 4 -rw-r--r-- 1 root root  347 Nov 24 23:07 archivo.h
+#10 0.185 4 -rw-r--r-- 1 root root  292 Nov 24 23:07 archivo_main.c
+#10 0.185 8 -rw-r--r-- 1 root root 4977 Nov 24 23:07 tcp.c
+#10 0.185 4 -rw-r--r-- 1 root root 1264 Nov 24 23:07 tcp.h
+#10 DONE 0.2s
+
+#11 [7/7] RUN ["make", "all"]
+#11 0.352 gcc -std=c11 -I./lib -c tcp.c
+#11 0.353 gcc: error: tcp.c: No such file or directory
+#11 0.353 gcc: fatal error: no input files
+#11 0.353 compilation terminated.
+#11 0.353 Makefile:14: recipe for target 'tcp.o' failed
+#11 0.353 make: *** [tcp.o] Error 1
+#11 ERROR: process "make all" did not complete successfully: exit code: 2
+------
+ > [7/7] RUN ["make", "all"]:
+#11 0.352 gcc -std=c11 -I./lib -c tcp.c
+#11 0.353 gcc: error: tcp.c: No such file or directory
+#11 0.353 gcc: fatal error: no input files
+#11 0.353 compilation terminated.
+#11 0.353 Makefile:14: recipe for target 'tcp.o' failed
+#11 0.353 make: *** [tcp.o] Error 1
+------

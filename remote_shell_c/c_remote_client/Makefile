@@ -17,10 +17,10 @@ tcp.o:
 # Para compilar la prueba de leercadena
 #
 leercadena: leercadena.o 
-	gcc $(CFLAGS) $(INCLUDE) -o leercadena_main leercadena_main.c leercadena.o
+	gcc $(CFLAGS) $(INCLUDE) -o leercadena_main ./lib/leercadena_main.c leercadena.o
 
 leercadena.o:
-	gcc $(CFLAGS) $(INCLUDE) -c leercadena.c
+	gcc $(CFLAGS) $(INCLUDE) -c ./lib/leercadena.c
 
 # ---
 
