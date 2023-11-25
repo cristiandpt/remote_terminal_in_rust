@@ -1,5 +1,6 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+use std::process::Command;
 
 // Server
 fn server() {
@@ -12,6 +13,23 @@ fn server() {
                 let mut buffer = [0; 1024];
                 stream.read(&mut buffer).expect("Failed to read from stream");
                 println!("Received message: {}", String::from_utf8_lossy(&buffer));
+
+                let output = if cfg!(target_os = "windows") {
+                    Command::new("cmd")
+                        .args(["/C", "echo hello"])
+                       // .spawn()
+                        .output()
+                        .expect("failed to execute process")
+                } else {
+                    Command::new("sh")
+                        .arg("-c")
+                        .arg("echo hello")
+                        //.spawn()
+                        .output()
+                        .expect("failed to execute process")
+                };
+                
+                let hello = output.stdout;
 
                 stream.write_all(b"Hello from server!").expect("Failed to write to stream");
             }
