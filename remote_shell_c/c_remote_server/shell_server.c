@@ -4,26 +4,25 @@
 #include <unistd.h>
 #include "tcp.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #define MAX 80
 
-int func(int sockfd) 
-{ char **vector;
-	char buff[MAX]; 
-	bzero(buff,MAX);
-	TCP_Read_String(sockfd, buff, MAX); 
-	printf("Se leyo %s\n",buff);
-  if (strcmp(buff, "exit\x0") == 0) {
-      return -1;  
-  }
-  vector = de_cadena_a_vector(buff);
-  int i = 0;
-  while (vector[i]) 
-    printf("%s\n",vector[i++]);
-  execvp(vector[0],vector);
-  return 1;
-
-} 
+char* func(int sockfd) {
+    char **vector;
+    char buff[MAX];
+    bzero(buff, MAX);
+    TCP_Read_String(sockfd, buff, MAX);
+    if (strcmp(buff, "exit") == 0) {
+        printf("Saliendo de la terminal remota\n");
+        return buff;
+    } else {
+        vector = de_cadena_a_vector(buff);
+        execvp(vector[0], vector);
+        perror("execvp");  // Print an error message if execvp fails
+        exit(EXIT_FAILURE);  // Terminate the child process if execvp fails
+    }
+}
 
 int main(int argc, char* argv[]) {
 
@@ -41,46 +40,49 @@ int main(int argc, char* argv[]) {
 		printf("Uso: %s <puerto>\n",argv[0]);
 		return 1;
 	}
-	
-	puerto = atoi(argv[1]);
 
+	puerto = atoi(argv[1]);
 	socket = TCP_Server_Open(puerto);
-	
-connfd = TCP_Accept(socket);
+  connfd = TCP_Accept(socket);
+  char* command;
 	// Function for chatting between client and server 
 	//configurar bucle del servidor
   while(1){
-    
+    pid_t pid;
     if (connfd < 0) {
-      printf("\033[1;36m");
-      printf("Error al aceptar la conexion\n");
-      printf("\033[0m"); 
-      continue;
+      break;
+    } else {
+      pid = fork();
     }
-    pid_t pid = fork();
-        if (pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    } else if (pid == 0) { // Child process
-        // Redirect standard output to the socket
-          if(func(connfd)<0){
-            printf("\033[1;36m");
-            printf("Saliendo de la terminal remota\n");
-            printf("\033[0m"); 
-            break;
-      //   if (dup2(connfd, STDOUT_FILENO) == -1) {
-      //       perror("dup2"); 
-         }
-    }
-   
 
+    if (pid == -1) {
+      perror("fork");
+      exit(EXIT_FAILURE);
+    } else if (pid == 0) { // Child process
+      dup2(connfd, STDOUT_FILENO);
+      command = func(connfd);
+      dup2(STDOUT_FILENO, STDOUT_FILENO);
+      // close(connfd);  // Close the file descriptor in the child process
+      break;
+    } else {
+      if (strcmp(command, "exit") == 0) {
+        printf("Saliendo de la terminal remota\n");
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)) {
+          printf("Child process exited with status: %d\n", WEXITSTATUS(status));
+        } else {
+          printf("Child process terminated abnormally\n");
+        }
+        close(connfd);
+        connfd = -1;
+        break;
+      }
+    }
   }
- close(connfd);
-	// After chatting close the socket 
+  close(connfd);
 	close(socket); 
   return 0;
 }
-
-    // Fork to create a child process
     
 

@@ -39,7 +39,9 @@ services:
         - internal-network
       stdin_open: true
       tty: true
-      command: bash  
+      command: bash
+      depends_on:
+        - c-server
 
   c-server:
       build:

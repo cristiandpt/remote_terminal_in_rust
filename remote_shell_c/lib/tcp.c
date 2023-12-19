@@ -22,8 +22,7 @@ int TCP_Open(char *hostname, t_port port) {
 int TCP_Open_By_IP(char *hostip, t_port port) {
 	int sockfd; 
 	struct sockaddr_in servaddr; 
-    puts(hostip);
-	 puts(port);
+
 	// socket create and varification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
@@ -185,9 +184,8 @@ int TCP_Close(t_socket sck) {
 }
 
 char *Get_IP(char *hostname) {
-	printf("hostname 2: %s\n", hostname);
 	struct hostent *host_entry;
-    printf("hostname: %s\n", hostname);
+
 	host_entry = gethostbyname(hostname);
 	if (host_entry == NULL) {
 		printf("host_entry failed..");
