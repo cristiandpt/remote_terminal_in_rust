@@ -12,3 +12,17 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+# Ignorar archivos objeto
+*.o
+
+# Ignorar archivos ejecutables (sin extensión en sistemas Unix-like)
+*
+!*.c
+!*.h
+!*.txt
+!*.md
+!*.yml
+!*.json
+!*.xml
+!*.gitignore
+!docker-compose.yml
