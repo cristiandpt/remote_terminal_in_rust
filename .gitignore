@@ -26,3 +26,4 @@ Cargo.lock
 !*.xml
 !*.gitignore
 !docker-compose.yml
+!Dockerfile
