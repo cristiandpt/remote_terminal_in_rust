@@ -37,9 +37,9 @@ services:
         - ./remote_shell_c/lib:/usr/src/client_shell/lib
       networks:
         - internal-network
-      #stdin_open: true
-      #tty: true
-      #command: bash  
+      stdin_open: true
+      tty: true
+      command: bash  
 
   c-server:
       build:
@@ -49,9 +49,12 @@ services:
         - 8085:8085
       volumes:
         - ./remote_shell_c/c_remote_server:/usr/src/server_shell
-        #- ./remote_shell_c/lib:/usr/src/server_shell/lib
+        - ./remote_shell_c/lib:/usr/src/server_shell/lib
       networks:
         - internal-network      
+      stdin_open: true
+      tty: true
+      command: bash  
 
 networks:
   internal-network:
