@@ -4,10 +4,13 @@ COPY ./lib /usr/src/temp_lib
 
 FROM gcc:4.9
 RUN ["mkdir", "-p", "/usr/src/client_shell/lib"]
-RUN ["mkdir", "-p", "/usr/src/client_shell_build/lib"]
-COPY --from=libstage /usr/src/temp_lib /usr/src/client_shell_build/lib
-COPY ./c_remote_client /usr/src/client_shell_build
-WORKDIR /usr/src/client_shell_build
+#RUN ["mkdir", "-p", "/usr/src/client_shell_build/lib"]
+COPY --from=libstage /usr/src/temp_lib /usr/src/client_shell/lib
+#_build/lib
+COPY ./c_remote_client /usr/src/client_shell
+#_build
+WORKDIR /usr/src/client_shell
+#_build
 RUN ls -lsa
 RUN ls -lsa lib
 RUN ["make", "all"]

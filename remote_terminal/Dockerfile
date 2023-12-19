@@ -25,4 +25,5 @@ RUN cargo build
 EXPOSE 8082
 
 # Specify the command to run when the container starts "--release"
-CMD ["cargo", "run", "--", "--help"]
+#CMD ["cargo", "run", "--", "--help"]
+CMD ["cargo", "run", "--", "-c", "ls l", "-n", "remote-server", "-p", "8083"]

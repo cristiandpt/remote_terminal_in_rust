@@ -1,4 +1,19 @@
 use clap::{Arg, Command};
+use std::io::{Read, Write};
+use std::net::TcpStream;
+
+fn client(command: String, hostname: String, port: String) {
+
+    let server_host = hostname;
+    let server_port = port;
+    let mut stream = TcpStream::connect(format!("{}:{}", server_host, server_port)).expect("Failed to connect to server");
+
+    stream.write_all(command.as_bytes()).expect("Failed to write to stream");
+
+    let mut response = String::new();
+    stream.read_to_string(&mut response).expect("Failed to read from stream");
+    println!("Received response: {}", response);
+}
 
 fn main() {
     println!("Hello, remote shell!");
@@ -8,31 +23,36 @@ fn main() {
                 .about("Client-Server remote shell")
                 .author("Cristian Pacheco, Julian Puyo, Sebastian Molina");
 
-    let first_name = Arg::new("command")
-                            .long("f")
+    let command_arg = Arg::new("command")
+                            .long("command")
+                            .short('c')
                             .help("Command to exectue in the remote shell")
                             .required(true);
     
-    let last_name = Arg::new("address")
-                            .long("l")
+    let hostname_arg = Arg::new("hostname")
+                            .long("hostname")
+                            .short('n')
                             .help("Address of remote shell")
-                            .required(true);
+                            .required(false);
 
-    let age = Arg::new("port")
-                    .long("a")
+    let port_arg = Arg::new("port")
+                    .long("port")
+                    .short('p')
                     .help("Port of the server")
-                    .required(true);
+                    .required(false);
 
-    let app = app.arg(first_name).arg(last_name).arg(age);
+    let app = app.arg(command_arg).arg(hostname_arg).arg(port_arg);
 
     let matches = app.get_matches();
     let command = matches.get_one::<String>("command").unwrap();
-    let address = matches.get_one::<String>("address").unwrap();
-    let port: &i8 = matches.get_one::<i8>("port").unwrap();
+    let hostname = matches.get_one::<String>("hostname").unwrap();
+    let port = matches.get_one::<String>("port").unwrap();
     
     println!("{:?}", command); 
-    println!("{:?}", address);
+    println!("{:?}", hostname);
     println!("{:?}", port);
+
+    client(command.clone(), hostname.clone(), port.clone());
                     
 }
 

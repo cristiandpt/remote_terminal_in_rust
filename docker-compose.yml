@@ -8,8 +8,12 @@ services:
       - 8082:8082
     volumes:
       - ./remote_terminal:/home/app/remote_terminal
+    depends_on:
+      - remote-server  
     networks:
       - internal-network
+    environment:   
+      - RUST_BACKTRACE=1
 
   remote-server:
     build:
@@ -27,27 +31,31 @@ services:
         context: ./remote_shell_c
         dockerfile: Dockerfile_client
       ports:
-        - 8083:8083
+        - 8084:8084
       volumes:
         - ./remote_shell_c/c_remote_client:/usr/src/client_shell
         - ./remote_shell_c/lib:/usr/src/client_shell/lib
       networks:
         - internal-network
-      #stdin_open: true
-      #tty: true
-      #command: bash  
+      stdin_open: true
+      tty: true
+      command: bash  
 
   c-server:
       build:
         context: ./remote_shell_c
         dockerfile: Dockerfile_server
       ports:
-        - 8084:8084
+        - 8085:8085
       volumes:
         - ./remote_shell_c/c_remote_server:/usr/src/server_shell
-        #- ./remote_shell_c/lib:/usr/src/server_shell/lib
+        - ./remote_shell_c/lib:/usr/src/server_shell/lib
       networks:
         - internal-network      
+      stdin_open: true
+      tty: true
+      command: bash  
 
 networks:
   internal-network:
+    driver: bridge
