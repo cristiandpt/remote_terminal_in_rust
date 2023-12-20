@@ -9,8 +9,15 @@
 
 #define MAX 80
 
+char **vector = NULL;
+
+void cleanup_before_exec() {
+  if (vector != NULL) {
+    liberar_vector(vector);
+  }
+}
+
 void func(int sockfd, char buff[MAX]) {
-  char **vector;
   TCP_Read_String(sockfd, buff, MAX);
   if (strcmp(buff, "exit") == 0) {
     exit(0);
@@ -58,6 +65,7 @@ int main(int argc, char* argv[]) {
       perror("fork");
       exit(EXIT_FAILURE);
     } else if (pid == 0) { // Child process
+      cleanup_before_exec();
       memset(buff, '\0', sizeof(buff));
       func(connfd, buff);
       break;
@@ -67,6 +75,7 @@ int main(int argc, char* argv[]) {
       if (WIFEXITED(status)) {
         printf("Child process exited with status: %d\n", WEXITSTATUS(status));
         memset(buff, '\0', sizeof(buff));
+        cleanup_before_exec();
       } else {
         printf("Saliendo de la terminal remota\n");
         // printf("Child process terminated abnormally\n");

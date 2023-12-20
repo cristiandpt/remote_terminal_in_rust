@@ -53,3 +53,11 @@ char** de_cadena_a_vector(char* cadena) {
   resultado[i] = NULL;
   return resultado;
 }
+
+// Function to free the memory allocated by de_cadena_a_vector
+void liberar_vector(char** vector) {
+    for (int i = 0; vector[i] != NULL; i++) {
+        free(vector[i]);
+    }
+    free(vector);
+}

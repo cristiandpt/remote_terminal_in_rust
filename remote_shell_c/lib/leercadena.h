@@ -18,4 +18,6 @@ int leer_de_teclado(int, char*);
 // funciones de la familia execv*
 char** de_cadena_a_vector(char*);
 
+void liberar_vector(char**);
+
 #endif
