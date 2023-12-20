@@ -8,20 +8,19 @@
 
 #define MAX 80
 
-char* func(int sockfd) {
-    char **vector;
-    char buff[MAX];
-    bzero(buff, MAX);
-    TCP_Read_String(sockfd, buff, MAX);
-    if (strcmp(buff, "exit") == 0) {
-        printf("Saliendo de la terminal remota\n");
-        return buff;
-    } else {
-        vector = de_cadena_a_vector(buff);
-        execvp(vector[0], vector);
-        perror("execvp");  // Print an error message if execvp fails
-        exit(EXIT_FAILURE);  // Terminate the child process if execvp fails
-    }
+void func(int sockfd) {
+  char **vector;
+  char buff[MAX];
+  bzero(buff, MAX);
+  TCP_Read_String(sockfd, buff, MAX);
+  if (strcmp(buff, "exit") == 0) {
+    exit(0);
+  } else {
+    vector = de_cadena_a_vector(buff);
+    execvp(vector[0], vector);
+    perror("execvp");  // Print an error message if execvp fails
+    exit(EXIT_FAILURE);  // Terminate the child process if execvp fails
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -29,7 +28,6 @@ int main(int argc, char* argv[]) {
   printf("\033[1;31m");
   printf("*****************************************\n");
   printf("* Bienvenido a la Terminal Remota       *\n");
-  printf("* Para salir escriba 'exit'             *\n");
   printf("*****************************************\n");
   printf("\033[0m"); 
 
@@ -60,23 +58,20 @@ int main(int argc, char* argv[]) {
       exit(EXIT_FAILURE);
     } else if (pid == 0) { // Child process
       dup2(connfd, STDOUT_FILENO);
-      command = func(connfd);
+      func(connfd);
       dup2(STDOUT_FILENO, STDOUT_FILENO);
       // close(connfd);  // Close the file descriptor in the child process
       break;
     } else {
-      if (strcmp(command, "exit") == 0) {
+      int status;
+      waitpid(pid, &status, 0);
+      if (WIFEXITED(status)) {
+        printf("Child process exited with status: %d\n", WEXITSTATUS(status));
+      } else {
         printf("Saliendo de la terminal remota\n");
-        int status;
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) {
-          printf("Child process exited with status: %d\n", WEXITSTATUS(status));
-        } else {
-          printf("Child process terminated abnormally\n");
-        }
+        // printf("Child process terminated abnormally\n");
         close(connfd);
-        connfd = -1;
-        break;
+	      connfd = -1;
       }
     }
   }
