@@ -3,23 +3,22 @@
 #include <strings.h>
 #include <unistd.h>
 #include "tcp.h"
+#include "leercadena.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 
 #define MAX 80
 
-void func(int sockfd) {
+void func(int sockfd, char buff[MAX]) {
   char **vector;
-  char buff[MAX];
-  bzero(buff, MAX);
   TCP_Read_String(sockfd, buff, MAX);
   if (strcmp(buff, "exit") == 0) {
     exit(0);
   } else {
     vector = de_cadena_a_vector(buff);
     execvp(vector[0], vector);
-    perror("execvp");  // Print an error message if execvp fails
-    exit(EXIT_FAILURE);  // Terminate the child process if execvp fails
+    perror("execvp");
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -31,7 +30,7 @@ int main(int argc, char* argv[]) {
   printf("*****************************************\n");
   printf("\033[0m"); 
 
-  int socket, connfd;  
+  int socket, connfd;
 	int puerto;
 
 	if (argc != 2) {
@@ -42,9 +41,11 @@ int main(int argc, char* argv[]) {
 	puerto = atoi(argv[1]);
 	socket = TCP_Server_Open(puerto);
   connfd = TCP_Accept(socket);
-  char* command;
-	// Function for chatting between client and server 
-	//configurar bucle del servidor
+  dup2(connfd, STDOUT_FILENO);
+  dup2(connfd, STDERR_FILENO);
+
+  char buff[MAX];
+
   while(1){
     pid_t pid;
     if (connfd < 0) {
@@ -57,16 +58,15 @@ int main(int argc, char* argv[]) {
       perror("fork");
       exit(EXIT_FAILURE);
     } else if (pid == 0) { // Child process
-      dup2(connfd, STDOUT_FILENO);
-      func(connfd);
-      dup2(STDOUT_FILENO, STDOUT_FILENO);
-      // close(connfd);  // Close the file descriptor in the child process
+      memset(buff, '\0', sizeof(buff));
+      func(connfd, buff);
       break;
     } else {
       int status;
       waitpid(pid, &status, 0);
       if (WIFEXITED(status)) {
         printf("Child process exited with status: %d\n", WEXITSTATUS(status));
+        memset(buff, '\0', sizeof(buff));
       } else {
         printf("Saliendo de la terminal remota\n");
         // printf("Child process terminated abnormally\n");
@@ -79,5 +79,3 @@ int main(int argc, char* argv[]) {
 	close(socket); 
   return 0;
 }
-    
-
