@@ -31,32 +31,28 @@ int main(int argc, char* argv[]) {
   port = atoi(argv[2]);
   sockfd = TCP_Open(Get_IP(host), port);
 
-  int quiebre = 1;
   while(1){
+    printf("Ingrese un comando: ");
+    leer_de_teclado(BUFSIZ, comando);
+    if (strcmp(comando,"exit") == 0) {
+      printf("\033[1;36m");
+      printf("Saliendo de la terminal remota\n");
+      printf("\033[0m");
+      break;
+    }
+
     pid_t pid = fork();
     if (pid == -1) {
       perror("fork");
       exit(EXIT_FAILURE);
     } else if (pid == 0) {
-      memset(comando, '\0', sizeof(comando));
-      printf("Ingrese un comando: ");
-      leer_de_teclado(BUFSIZ, comando);
       TCP_Write_String(sockfd, comando);
-      if (strcmp(comando,"exit") == 0) {
-        printf("\033[1;36m");
-        printf("Saliendo de la terminal remota\n");
-        printf("\033[0m");
-        quiebre = 0;
-        exit(0);
-      }
+      memset(comando, '\0', sizeof(comando));
       exit(0);
     } else {
-      if (quiebre == 0) {
-        exit(0);
-      }
       int status;
       waitpid(pid, &status, 0);
-      if (WIFEXITED(status)) { 
+      if (WIFEXITED(status)) {
         memset(salida, '\0', sizeof(salida));
         TCP_Read_String(sockfd, salida, BUFSIZ);
         memset(salida, '\0', sizeof(salida));
