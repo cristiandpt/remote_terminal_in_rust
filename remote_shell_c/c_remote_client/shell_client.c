@@ -1,91 +1,71 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/time.h>
 #include "leercadena.h"
 #include "tcp.h"
-
-int kbhit(void) {
-    struct timeval tv = { 0L, 0L };
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(0, &fds);
-    return select(1, &fds, NULL, NULL, &tv);
-}
+#include <sys/wait.h>
+#include <ctype.h>
 
 int main(int argc, char* argv[]) {
-
-  //char input[1024];
-  //int index = 0;
-  //char indicators[] = {'/', '-', '|', '\\'};
-  //int indicatorIndex = 0;
-
- 
-
-  char comando[BUFSIZ];
-  char **comando_vector;
-  int i;
-  char *host;
-  int sockfd, port;  
-
-   if ( argc != 3 ) {
-    printf("Uso: %s <host> <puerto>\n", argv[0]);
-    return 1;
-  }
-
   printf("\033[1;36m"); 
   printf("*****************************************\n");
   printf("* Bienvenido a la Terminal Remota       *\n");
   printf("* Para salir escriba 'exit'             *\n");
   printf("*****************************************\n");
-  printf("\033[0m"); 
+  printf("\033[0m");
+
+  char comando[BUFSIZ];
+  char salida[BUFSIZ];
+  int i;
+  char *host;
+  int sockfd, port;
+
+  if ( argc != 3 ) {
+    printf("Uso: %s <host> <puerto>\n", argv[0]);
+    return 1;
+  }
+
   host = argv[1];
   port = atoi(argv[2]);
-	sockfd = TCP_Open(Get_IP(host), port);
+  sockfd = TCP_Open(Get_IP(host), port);
 
- 
   while(1){
-    
+    memset(comando, '\0', sizeof(comando));
     printf("Ingrese un comando: ");
     leer_de_teclado(BUFSIZ, comando);
-    TCP_Write_String(sockfd, comando); 
-    //printf("Comando ingresado: %s\n",  comando);
-    //puts(comando)
     if (strcmp(comando,"exit") == 0) {
       printf("\033[1;36m");
       printf("Saliendo de la terminal remota\n");
-      printf("\033[0m"); 
+      printf("\033[0m");
       break;
     }
 
-  }
-
-
-
- //fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
-
- //while (1) {
- //    if (kbhit()) {
- //        char ch = getchar();
- //        if (ch == '\n') {
- //            input[index] = '\0';
- //            printf("\nUsted escribió: %s\n", input);
- //            index = 0;
- //            memset(input, 0, sizeof(input));
- //        } else if (ch != EOF) {
- //            input[index++] = ch;
- //        }
- //    }
-
- //    // Imprimir el indicador
- //    printf("\rIngrese un comando:%c", indicators[indicatorIndex]);
- //    fflush(stdout);
- //    indicatorIndex = (indicatorIndex + 1) % 4;
-
- //    // Pausa antes de la siguiente actualización
- //    usleep(200000); // 200 milisegundos
- //}
-
+    pid_t pid = fork();
+    if (pid == -1) {
+      perror("fork");
+      exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+      TCP_Write_String(sockfd, comando);
+      exit(0);
+    } else {
+      int status;
+      waitpid(pid, &status, 0);
+      if (WIFEXITED(status)) {
+        memset(comando, '\0', sizeof(comando));
+        memset(salida, '\0', sizeof(salida));
+        TCP_Read_String(sockfd, salida, BUFSIZ);
+        memset(salida, '\0', sizeof(salida));
+        TCP_Read_String(sockfd, salida, BUFSIZ);
+        printf("%s", salida);
+        // printf("Child process exited with status: %d\n", WEXITSTATUS(status));
+        continue;
+      } else {
+        printf("Child process terminated abnormally\n");
+      }
+    }
+  }  
   return 0;
 }

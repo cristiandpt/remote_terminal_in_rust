@@ -1,7 +1,7 @@
 INCLUDE = -I./lib
 CFLAGS = -std=c11
 
-all: basic_client shell_client file_client archivo leercadena
+all: clean tcp.o leercadena.o archivo leercadena basic_client shell_client file_client 
 
 basic_client: tcp.o
 	gcc $(CFLAGS) $(INCLUDE) -o basic_client basic_client.c tcp.o
